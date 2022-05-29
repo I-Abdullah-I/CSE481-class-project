@@ -5,6 +5,7 @@
 #   List<UDD:Point>
 
 import enum
+from unittest import result
 # from webbrowser import Opera
 import numpy as np
 
@@ -74,7 +75,13 @@ class KenKenBoard:
                 self.cages.remove(cage)
         print('Freebies selection: ', self.mstate)
 
+    def validate_cage_constraint(self):
+        return 0
+
     def solve_with_backtracking(self):
+        if np.all(self.mRowHash) and np.all(self.mColHash):
+            print('Final mstate: \n', self.mstate)
+            return 'success'
         for cage in self.cages:
             for cell in cage.cells:
                 x_pos = cell.x
@@ -85,9 +92,24 @@ class KenKenBoard:
                             self.mColHash[y_pos][val - 1] = True
                             self.mRowHash[x_pos][val - 1] = True
                             self.mstate[x_pos][y_pos] = val
-                            self.solve_with_backtracking()
-                            print('Current mstate: ', self.mstate)
-                            input('Press any key to continue')
+                            
+                            if cage.cells.index(cell) == len(cage.cells) - 1:
+                                cage_validated = self.validate_cage_constraint()
+                            
+                            if cage_validated:
+                                result = self.solve_with_backtracking()
+                            elif not cage_validated:
+                                result = False
+
+                            if not result:
+                                self.mColHash[y_pos][val - 1] = False
+                                self.mRowHash[x_pos][val - 1] = False
+                                self.mstate[x_pos][y_pos] = 0
+                            elif result:
+                                return True
+                            print('Current mstate: \n', self.mstate)
+                            # input('Press any key to continue')
+                    return False
                 
 
     # def create_solutions(self):
