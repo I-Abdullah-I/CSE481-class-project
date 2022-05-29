@@ -5,7 +5,7 @@
 #   List<UDD:Point>
 
 import enum
-from webbrowser import Opera
+# from webbrowser import Opera
 import numpy as np
 
 class Operator(enum.Enum):
@@ -23,34 +23,31 @@ class Cell:
         self.domain = np.empty((0),np.int32)
 
 
-
 class SubCage:
-    def __init__(self, operator, value, cells):
+    def __init__(self, operator, value, cells=[], solutions=[]):
         self.operator = operator
         self.value = value
         self.cells = cells
-
-
-
-# class Cage:
-#     def __init__(self, list_sub_cages):
-#         self.list_sub_cages =
+        # self.solutions = solutions
 
 class KenKenBoard:
     def __init__(self, size, cages):
         self.size = size
         self.cages = cages
-        self.mRowHash = np.full((size,size),False)
-        self.mColHash = np.full((size,size),False)
-        self.mstate = np.empty((0, self.size), np.int32)
+        self.mRowHash = np.full((size,size), False)
+        self.mColHash = np.full((size,size), False)
+        self.mstate = np.full((self.size, self.size), 0)
         rows,cols = (size,size)
         self.mDomain = [[0 for i in range(cols)] for j in range(rows)]
+        self.current_x = 0
+        self.current_y = 0
 
     # Initially fill all cells with all possible values and filling constants with its value only
     def init_domain_fill(self):
         default_domain = [x for x in range(1,self.size+1)]
         for cage in self.cages:
             if cage.operator == Operator.Constant:
+                cage.cells[0].domain = [cage.value]
                 index_x = cage.cells[0].x
                 index_y = cage.cells[0].y
                 self.mDomain[index_x][index_y] = [cage.value]
@@ -59,8 +56,46 @@ class KenKenBoard:
                 index_y = [y1.y for y1 in cage.cells]
                 for j in range(len(index_x)):
                     self.mDomain[index_x[j]][index_y[j]] = default_domain
-        # print(self.mDomain)
+                    cage.cells[j].domain = default_domain
+        print(self.mDomain)
 
+    def can_place(self, value, x, y):
+        return not(self.mColHash[y][value-1] or self.mRowHash[x][value-1])
+
+    def fill_freebie(self):
+        for cage in self.cages:
+            # Freebie case
+            if len(cage.cells) == 1:
+                x_pos = cage.cells[0].x
+                y_pos = cage.cells[0].y
+                self.mstate[x_pos][y_pos] = cage.value
+                self.mColHash[y_pos][cage.value - 1] = True
+                self.mRowHash[x_pos][cage.value - 1] = True
+                self.cages.remove(cage)
+        print('Freebies selection: ', self.mstate)
+
+    def solve_with_backtracking(self):
+        for cage in self.cages:
+            for cell in cage.cells:
+                x_pos = cell.x
+                y_pos = cell.y
+                if self.mstate[x_pos][y_pos] == 0:
+                    for val in cell.domain:
+                        if self.can_place(val, x_pos, y_pos):
+                            self.mColHash[y_pos][val - 1] = True
+                            self.mRowHash[x_pos][val - 1] = True
+                            self.mstate[x_pos][y_pos] = val
+                            self.solve_with_backtracking()
+                            print('Current mstate: ', self.mstate)
+                            input('Press any key to continue')
+                
+
+    # def create_solutions(self):
+    #     for cage in self.cages:
+    #         num_of_cells = len(cage.cells)
+
+
+    
     def print_board(self):
         print(self.mstate)
 
@@ -76,3 +111,5 @@ board = KenKenBoard(size = 3,cages = Cages)
 # board.fill_board()
 # board.print_board()
 board.init_domain_fill()
+board.fill_freebie()
+board.solve_with_backtracking()
