@@ -24,12 +24,18 @@ class Cell:
         self.domain = np.empty((0),np.int32)
 
 
-class SubCage:
+class Cage:
     def __init__(self, operator, value, cells=[], solutions=[]):
         self.operator = operator
         self.value = value
         self.cells = cells
         # self.solutions = solutions
+
+
+    
+
+
+        
 
 class KenKenBoard:
     def __init__(self, size, cages):
@@ -42,6 +48,44 @@ class KenKenBoard:
         self.mDomain = [[0 for i in range(cols)] for j in range(rows)]
         self.current_x = 0
         self.current_y = 0
+
+
+    def validate_cage_constraint(self, cage):
+     
+        expansion_of_cage = list()
+        for cell in cage.cells:
+            expansion_of_cage.append(self.mstate[cell.x][cell.y])
+
+        if cage.operator == Operator.Add :
+            return sum(expansion_of_cage) == cage.value
+        elif cage.operator == Operator.Subtract : #Subtract Cages is only 2 cells
+            """
+            Subtract Cages is only 2 cells
+            Because order of subrtacting among more than 2 cells will be distinctive
+            """
+            if len(expansion_of_cage) != 2 :
+                return False
+            return abs(expansion_of_cage[0]-expansion_of_cage[1]) == cage.value
+
+        elif cage.operator == Operator.Multiply :
+            return np.prod(expansion_of_cage) == cage.value
+
+        elif cage.operator == Operator.Divide : #Division Cages is only 2 cells
+            """
+            Subtract Cages is only 2 cells
+            Because order of subrtacting among more than 2 cells will be distinctive
+            """
+            if(expansion_of_cage[0] > expansion_of_cage[1]):
+                return (expansion_of_cage[0] / expansion_of_cage[1]) == cage.value
+            elif(expansion_of_cage[0] < expansion_of_cage[1]):
+                return (expansion_of_cage[1] / expansion_of_cage[0]) == cage.value
+
+
+
+
+
+
+
 
     # Initially fill all cells with all possible values and filling constants with its value only
     def init_domain_fill(self):
@@ -75,13 +119,12 @@ class KenKenBoard:
                 self.cages.remove(cage)
         print('Freebies selection: ', self.mstate)
 
-    def validate_cage_constraint(self):
-        return 0
+    
 
     def solve_with_backtracking(self):
         if np.all(self.mRowHash) and np.all(self.mColHash):
             print('Final mstate: \n', self.mstate)
-            return 'success'
+            return True
         for cage in self.cages:
             for cell in cage.cells:
                 x_pos = cell.x
@@ -93,8 +136,11 @@ class KenKenBoard:
                             self.mRowHash[x_pos][val - 1] = True
                             self.mstate[x_pos][y_pos] = val
                             
-                            if cage.cells.index(cell) == len(cage.cells) - 1:
-                                cage_validated = self.validate_cage_constraint()
+                            if cell == cage.cells[-1]:
+                                
+                                cage_validated = self.validate_cage_constraint(cage)
+                            else:
+                                cage_validated = True
                             
                             if cage_validated:
                                 result = self.solve_with_backtracking()
@@ -123,15 +169,31 @@ class KenKenBoard:
 
             
 
-sub1 = SubCage(Operator.Constant, 2, [Cell(0, 0)])
-sub2 = SubCage(Operator.Subtract, 2, [Cell(0, 1), Cell(1, 1)])
-sub3 = SubCage(Operator.Subtract, 1, [Cell(0, 2), Cell(1, 2)])
-sub4 = SubCage(Operator.Add, 6, [Cell(1, 0), Cell(2, 0), Cell(2, 1)])
-sub5 = SubCage(Operator.Constant, 1, [Cell(2, 2)])
-Cages = [sub1, sub2, sub3, sub4, sub5]
-board = KenKenBoard(size = 3,cages = Cages)
+# sub1 = Cage(Operator.Constant, 2, [Cell(0, 0)])
+# sub2 = Cage(Operator.Subtract, 2, [Cell(0, 1), Cell(1, 1)])
+# sub3 = Cage(Operator.Subtract, 1, [Cell(0, 2), Cell(1, 2)])
+# sub4 = Cage(Operator.Add, 6, [Cell(1, 0), Cell(2, 0), Cell(2, 1)])
+# sub5 = Cage(Operator.Constant, 1, [Cell(2, 2)])
+
+
+# Cages = [sub1, sub2, sub3, sub4, sub5]
+# board = KenKenBoard(size = 3,cages = Cages)
 # board.fill_board()
 # board.print_board()
+
+cages = [Cage(operator=Operator.Divide, value=2, cells=[Cell(0,0), Cell(1,0)])
+, Cage(operator=Operator.Add, value=6, cells=[Cell(0,1), Cell(1,1),Cell(2,1)])
+, Cage(operator=Operator.Subtract, value=1, cells=[Cell(0,2), Cell(0,3)])
+, Cage(operator=Operator.Multiply, value=12, cells=[Cell(1,2), Cell(1,3), Cell(2,3)])
+, Cage(operator=Operator.Constant, value=1, cells=[Cell(2,0)])
+, Cage(operator=Operator.Add, value=5, cells=[Cell(3,2), Cell(2,2), Cell(3,3)])
+, Cage(operator=Operator.Subtract, value=1, cells=[Cell(3,0), Cell(3,1)])]
+
+board = KenKenBoard(size = 4, cages = cages)
+
+board.print_board()
+
+
 board.init_domain_fill()
 board.fill_freebie()
 board.solve_with_backtracking()
