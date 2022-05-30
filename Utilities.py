@@ -81,11 +81,11 @@ class KenKenBoard:
                 self.mColHash[y_pos][cage.value - 1] = True
                 self.mRowHash[x_pos][cage.value - 1] = True
                 self.cages.remove(cage)
-        print('Freebies selection: ', self.mstate)
+        print('Freebies selection:\n', self.mstate)
 
     def solve_with_backtracking(self):
         if np.all(self.mRowHash) and np.all(self.mColHash):
-            print('Final mstate: \n', self.mstate)
+            print('Final mstate:\n', self.mstate)
             return True
         for cage in self.cages:
             for cell in cage.cells:
@@ -119,7 +119,17 @@ class KenKenBoard:
                             # input('Press any key to continue')
                     return False
 
-            
+def solve(cages, size, algorithm):
+    board = KenKenBoard(size=size, cages=cages)
+    board.init_domain_fill()
+    board.fill_freebie()
+    if algorithm == 0:
+        board.solve_with_backtracking()
+    elif algorithm == 1:
+        pass
+    elif algorithm == 2:
+        pass
+
 """Test case No.1"""
 # sub1 = Cage(Operator.Constant, 2, [Cell(0, 0)])
 # sub2 = Cage(Operator.Subtract, 2, [Cell(0, 1), Cell(1, 1)])
@@ -157,10 +167,7 @@ cages = [
     Cage(operator=Operator.Add, value=8, cells=[Cell(3,2), Cell(2,2), Cell(3,3)]),
     Cage(operator=Operator.Subtract, value=3, cells=[Cell(1,3), Cell(2,3)])
 ]
-board = KenKenBoard(size = 4, cages = cages)
-board.init_domain_fill()
-board.fill_freebie()
-board.solve_with_backtracking()
+solve(cages, 4, 0)
 
 # """Test case No.4"""
 # cages = [
