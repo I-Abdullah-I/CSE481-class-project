@@ -81,11 +81,11 @@ class KenKenBoard:
                 self.mColHash[y_pos][cage.value - 1] = True
                 self.mRowHash[x_pos][cage.value - 1] = True
                 self.cages.remove(cage)
-        print('Freebies selection:\n', self.mstate)
+        # print('Freebies selection:\n', self.mstate)
 
     def solve_with_backtracking(self):
         if np.all(self.mRowHash) and np.all(self.mColHash):
-            print('Final mstate:\n', self.mstate)
+            # print('Final mstate:\n', self.mstate)
             return True
         for cage in self.cages:
             for cell in cage.cells:
@@ -125,6 +125,7 @@ def solve(cages, size, algorithm):
     board.fill_freebie()
     if algorithm == 0:
         board.solve_with_backtracking()
+        return board.mstate
     elif algorithm == 1:
         pass
     elif algorithm == 2:
@@ -167,7 +168,8 @@ cages = [
     Cage(operator=Operator.Add, value=8, cells=[Cell(3,2), Cell(2,2), Cell(3,3)]),
     Cage(operator=Operator.Subtract, value=3, cells=[Cell(1,3), Cell(2,3)])
 ]
-solve(cages, 4, 0)
+mstate = solve(cages, 4, 0)
+print("Solution:\n", mstate)
 
 # """Test case No.4"""
 # cages = [
