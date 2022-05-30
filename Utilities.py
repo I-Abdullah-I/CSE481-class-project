@@ -1,12 +1,4 @@
-# cages = List<UDD:Cage>
-# UDD Cage:
-#   operator
-#   value
-#   List<UDD:Point>
-
 import enum
-from unittest import result
-# from webbrowser import Opera
 import numpy as np
 
 class Operator(enum.Enum):
@@ -16,26 +8,17 @@ class Operator(enum.Enum):
     Divide = 3
     Constant = 4
 
-
 class Cell:
     def __init__(self, x, y):
         self.x = x
         self.y = y
         self.domain = np.empty((0),np.int32)
 
-
 class Cage:
     def __init__(self, operator, value, cells=[], solutions=[]):
         self.operator = operator
         self.value = value
         self.cells = cells
-        # self.solutions = solutions
-
-
-    
-
-
-        
 
 class KenKenBoard:
     def __init__(self, size, cages):
@@ -46,12 +29,8 @@ class KenKenBoard:
         self.mstate = np.full((self.size, self.size), 0)
         rows,cols = (size,size)
         self.mDomain = [[0 for i in range(cols)] for j in range(rows)]
-        self.current_x = 0
-        self.current_y = 0
-
-
-    def validate_cage_constraint(self, cage):
-     
+    
+    def validate_cage_constraint(self, cage): 
         expansion_of_cage = list()
         for cell in cage.cells:
             expansion_of_cage.append(self.mstate[cell.x][cell.y])
@@ -80,36 +59,21 @@ class KenKenBoard:
             elif(expansion_of_cage[0] < expansion_of_cage[1]):
                 return (expansion_of_cage[1] / expansion_of_cage[0]) == cage.value
 
-
-
-
-
-
-
-
-    # Initially fill all cells with all possible values and filling constants with its value only
+    """Initially fill all cells with all possible values and filling constants with its value only"""
     def init_domain_fill(self):
         default_domain = [x for x in range(1,self.size+1)]
         for cage in self.cages:
             if cage.operator == Operator.Constant:
                 cage.cells[0].domain = [cage.value]
-                index_x = cage.cells[0].x
-                index_y = cage.cells[0].y
-                self.mDomain[index_x][index_y] = [cage.value]
             else:
-                index_x = [x1.x for x1 in cage.cells]
-                index_y = [y1.y for y1 in cage.cells]
-                for j in range(len(index_x)):
-                    self.mDomain[index_x[j]][index_y[j]] = default_domain
+                for j in range(len(cage.cells)):
                     cage.cells[j].domain = default_domain
-        print(self.mDomain)
 
     def can_place(self, value, x, y):
         return not(self.mColHash[y][value-1] or self.mRowHash[x][value-1])
 
     def fill_freebie(self):
         for cage in self.cages:
-            # Freebie case
             if len(cage.cells) == 1:
                 x_pos = cage.cells[0].x
                 y_pos = cage.cells[0].y
@@ -118,8 +82,6 @@ class KenKenBoard:
                 self.mRowHash[x_pos][cage.value - 1] = True
                 self.cages.remove(cage)
         print('Freebies selection: ', self.mstate)
-
-    
 
     def solve_with_backtracking(self):
         if np.all(self.mRowHash) and np.all(self.mColHash):
@@ -153,47 +115,70 @@ class KenKenBoard:
                                 self.mstate[x_pos][y_pos] = 0
                             elif result:
                                 return True
-                            print('Current mstate: \n', self.mstate)
+                            # print('Current mstate: \n', self.mstate)
                             # input('Press any key to continue')
                     return False
-                
-
-    # def create_solutions(self):
-    #     for cage in self.cages:
-    #         num_of_cells = len(cage.cells)
-
-
-    
-    def print_board(self):
-        print(self.mstate)
 
             
-
+"""Test case No.1"""
 # sub1 = Cage(Operator.Constant, 2, [Cell(0, 0)])
 # sub2 = Cage(Operator.Subtract, 2, [Cell(0, 1), Cell(1, 1)])
 # sub3 = Cage(Operator.Subtract, 1, [Cell(0, 2), Cell(1, 2)])
 # sub4 = Cage(Operator.Add, 6, [Cell(1, 0), Cell(2, 0), Cell(2, 1)])
 # sub5 = Cage(Operator.Constant, 1, [Cell(2, 2)])
-
-
 # Cages = [sub1, sub2, sub3, sub4, sub5]
 # board = KenKenBoard(size = 3,cages = Cages)
-# board.fill_board()
-# board.print_board()
+# board.init_domain_fill()
+# board.fill_freebie()
+# board.solve_with_backtracking()
 
-cages = [Cage(operator=Operator.Divide, value=2, cells=[Cell(0,0), Cell(1,0)])
-, Cage(operator=Operator.Add, value=6, cells=[Cell(0,1), Cell(1,1),Cell(2,1)])
-, Cage(operator=Operator.Subtract, value=1, cells=[Cell(0,2), Cell(0,3)])
-, Cage(operator=Operator.Multiply, value=12, cells=[Cell(1,2), Cell(1,3), Cell(2,3)])
-, Cage(operator=Operator.Constant, value=1, cells=[Cell(2,0)])
-, Cage(operator=Operator.Add, value=5, cells=[Cell(3,2), Cell(2,2), Cell(3,3)])
-, Cage(operator=Operator.Subtract, value=1, cells=[Cell(3,0), Cell(3,1)])]
+"""Test case No.2"""
+# cages = [
+#     Cage(operator=Operator.Divide, value=2, cells=[Cell(0,0), Cell(1,0)]),
+#     Cage(operator=Operator.Add, value=6, cells=[Cell(0,1), Cell(1,1),Cell(2,1)]),
+#     Cage(operator=Operator.Subtract, value=1, cells=[Cell(0,2), Cell(0,3)]),
+#     Cage(operator=Operator.Multiply, value=12, cells=[Cell(1,2), Cell(1,3), Cell(2,3)]),
+#     Cage(operator=Operator.Constant, value=1, cells=[Cell(2,0)]),
+#     Cage(operator=Operator.Add, value=5, cells=[Cell(3,2), Cell(2,2), Cell(3,3)]),
+#     Cage(operator=Operator.Subtract, value=1, cells=[Cell(3,0), Cell(3,1)])
+# ]
+# board = KenKenBoard(size = 4, cages = cages)
+# board.init_domain_fill()
+# board.fill_freebie()
+# board.solve_with_backtracking()
 
+"""Test case No.3"""
+cages = [
+    Cage(operator=Operator.Subtract, value=1, cells=[Cell(0,0), Cell(1,0)]),
+    Cage(operator=Operator.Add, value=6, cells=[Cell(0,1), Cell(1,1), Cell(2,1)]),
+    Cage(operator=Operator.Multiply, value=8, cells=[Cell(0,2), Cell(0,3), Cell(1, 2)]),
+    Cage(operator=Operator.Divide, value=2, cells=[Cell(2,0), Cell(3,0)]),
+    Cage(operator=Operator.Constant, value=4, cells=[Cell(3,1)]),
+    Cage(operator=Operator.Add, value=8, cells=[Cell(3,2), Cell(2,2), Cell(3,3)]),
+    Cage(operator=Operator.Subtract, value=3, cells=[Cell(1,3), Cell(2,3)])
+]
 board = KenKenBoard(size = 4, cages = cages)
-
-board.print_board()
-
-
 board.init_domain_fill()
 board.fill_freebie()
 board.solve_with_backtracking()
+
+# """Test case No.4"""
+# cages = [
+#     Cage(operator=Operator.Multiply, value=420, cells=[Cell(0,0), Cell(0,1), Cell(1,0), Cell(1,1)]),
+#     Cage(operator=Operator.Multiply, value=10, cells=[Cell(0,2), Cell(0,3), Cell(0,4)]),
+#     Cage(operator=Operator.Multiply, value=84, cells=[Cell(1,2), Cell(1,3), Cell(1,4)]),
+#     Cage(operator=Operator.Subtract, value=5, cells=[Cell(0,5), Cell(1,5)]),
+#     Cage(operator=Operator.Multiply, value=72, cells=[Cell(0,6), Cell(0,7)]),
+#     Cage(operator=Operator.Divide, value=2, cells=[Cell(0,8), Cell(1,8)]),
+#     Cage(operator=Operator.Multiply, value=288, cells=[Cell(2,0), Cell(3,0), Cell(4,0)]),
+#     Cage(operator=Operator.Add, value=3, cells=[Cell(2,1), Cell(2,2)]),
+#     Cage(operator=Operator.Multiply, value=12, cells=[Cell(2,3), Cell(2,4)]),
+#     Cage(operator=Operator.Multiply, value=168, cells=[Cell(2,3), Cell(2,4)]),
+#     Cage(operator=Operator.Constant, value=4, cells=[Cell(3,1)]),
+#     Cage(operator=Operator.Add, value=8, cells=[Cell(3,2), Cell(2,2), Cell(3,3)]),
+#     Cage(operator=Operator.Subtract, value=3, cells=[Cell(1,3), Cell(2,3)])
+# ]
+# board = KenKenBoard(size = 4, cages = cages)
+# board.init_domain_fill()
+# board.fill_freebie()
+# board.solve_with_backtracking()
