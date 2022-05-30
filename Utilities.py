@@ -1,24 +1,7 @@
 import enum
 import numpy as np
-
-class Operator(enum.Enum):
-    Add = 0
-    Subtract = 1
-    Multiply = 2
-    Divide = 3
-    Constant = 4
-
-class Cell:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.domain = np.empty((0),np.int32)
-
-class Cage:
-    def __init__(self, operator, value, cells=[], solutions=[]):
-        self.operator = operator
-        self.value = value
-        self.cells = cells
+from Generate import generate
+from main_utilities import *
 
 class KenKenBoard:
     def __init__(self, size, cages):
@@ -73,6 +56,7 @@ class KenKenBoard:
         return not(self.mColHash[y][value-1] or self.mRowHash[x][value-1])
 
     def fill_freebie(self):
+        filtered_list = list(self.cages)
         for cage in self.cages:
             if len(cage.cells) == 1:
                 x_pos = cage.cells[0].x
@@ -80,7 +64,8 @@ class KenKenBoard:
                 self.mstate[x_pos][y_pos] = cage.value
                 self.mColHash[y_pos][cage.value - 1] = True
                 self.mRowHash[x_pos][cage.value - 1] = True
-                self.cages.remove(cage)
+                filtered_list.remove(cage)
+        self.cages = filtered_list
         # print('Freebies selection:\n', self.mstate)
 
     def solve_with_backtracking(self):
@@ -131,6 +116,7 @@ def solve(cages, size, algorithm):
     elif algorithm == 2:
         pass
 
+
 """Test case No.1"""
 # sub1 = Cage(Operator.Constant, 2, [Cell(0, 0)])
 # sub2 = Cage(Operator.Subtract, 2, [Cell(0, 1), Cell(1, 1)])
@@ -159,19 +145,39 @@ def solve(cages, size, algorithm):
 # board.solve_with_backtracking()
 
 """Test case No.3"""
-cages = [
-    Cage(operator=Operator.Subtract, value=1, cells=[Cell(0,0), Cell(1,0)]),
-    Cage(operator=Operator.Add, value=6, cells=[Cell(0,1), Cell(1,1), Cell(2,1)]),
-    Cage(operator=Operator.Multiply, value=8, cells=[Cell(0,2), Cell(0,3), Cell(1, 2)]),
-    Cage(operator=Operator.Divide, value=2, cells=[Cell(2,0), Cell(3,0)]),
-    Cage(operator=Operator.Constant, value=4, cells=[Cell(3,1)]),
-    Cage(operator=Operator.Add, value=8, cells=[Cell(3,2), Cell(2,2), Cell(3,3)]),
-    Cage(operator=Operator.Subtract, value=3, cells=[Cell(1,3), Cell(2,3)])
-]
-mstate = solve(cages, 4, 0)
-print("Solution:\n", mstate)
+# cages = [
+#     Cage(operator=Operator.Subtract, value=1, cells=[Cell(0,0), Cell(1,0)]),
+#     Cage(operator=Operator.Add, value=6, cells=[Cell(0,1), Cell(1,1), Cell(2,1)]),
+#     Cage(operator=Operator.Multiply, value=8, cells=[Cell(0,2), Cell(0,3), Cell(1, 2)]),
+#     Cage(operator=Operator.Divide, value=2, cells=[Cell(2,0), Cell(3,0)]),
+#     Cage(operator=Operator.Constant, value=4, cells=[Cell(3,1)]),
+#     Cage(operator=Operator.Add, value=8, cells=[Cell(3,2), Cell(2,2), Cell(3,3)]),
+#     Cage(operator=Operator.Subtract, value=3, cells=[Cell(1,3), Cell(2,3)])
+# ]
+# mstate = solve(cages, 4, 0)
+# print("Solution:\n", mstate)
 
-# """Test case No.4"""
+"""Test case No.4"""
+# cages = [
+#     Cage(operator=Operator.Add, value=6, cells=[Cell(0,0), Cell(0,1), Cell(1,1)]),
+#     Cage(operator=Operator.Add, value=6, cells=[Cell(0,2), Cell(1,2), Cell(2,2)]),
+#     Cage(operator=Operator.Add, value=6, cells=[Cell(1,0), Cell(2,0), Cell(2,1)]),
+# ]
+# mstate = solve(cages, 3, 0)
+# print("Solution:\n", mstate)
+
+"""Test case No.5"""
+# cages = [
+#     Cage(operator=Operator.Multiply, value=4, cells=[Cell(0,1), Cell(0,2), Cell(1,2)]),
+#     Cage(operator=Operator.Add, value=10, cells=[Cell(0,3), Cell(1,3), Cell(2,3), Cell(2,2)]),
+#     Cage(operator=Operator.Add, value=12, cells=[Cell(1,0), Cell(1,1), Cell(2,1), Cell(3,1)]),
+#     Cage(operator=Operator.Divide, value=2, cells=[Cell(2,0), Cell(3,0)]),
+#     Cage(operator=Operator.Constant, value=3, cells=[Cell(3,3)]),
+# ]
+# mstate = solve(cages, 4, 0)
+# print("Solution:\n", mstate)
+
+"""Test case No.5"""
 # cages = [
 #     Cage(operator=Operator.Multiply, value=420, cells=[Cell(0,0), Cell(0,1), Cell(1,0), Cell(1,1)]),
 #     Cage(operator=Operator.Multiply, value=10, cells=[Cell(0,2), Cell(0,3), Cell(0,4)]),
@@ -191,3 +197,15 @@ print("Solution:\n", mstate)
 # board.init_domain_fill()
 # board.fill_freebie()
 # board.solve_with_backtracking()
+
+"""Random Testcase"""
+size = 4
+cages, solution = generate(size)
+cells_count = 0
+for cage in cages:
+#     print(type(cage.cells[0]))
+    cells_count += len(cage.cells)
+    print('Cage operator: {} \t cage value: {} \t cage cells: {}'.format(cage.operator, cage.value, [(cell.x, cell.y) for cell in cage.cells]))
+print(cells_count)
+print("Solution\n", solution)
+print("My solution:\n", solve(cages, size, 0))

@@ -1,10 +1,9 @@
-from msilib.schema import Class
-from webbrowser import Opera
 import numpy as np
 import random
-from Utilities import Cell,Cage,Operator
-from random import randint,choice
+from main_utilities import *
+from random import choice
 import math
+
 def Initiate(size):
     row = np.arange(1,size+1)
     # creating 2 d board with the range given and satisfying the base condition (no element shall be repeated in a row or a column)
@@ -30,6 +29,7 @@ def create_cages(board,size):
     uncaged_cells = np.empty(0,Cell)
     for j in range(uncaged_cells_indecies_size):
         temp_cell = Cell(uncaged_cells_indecies[0][j],uncaged_cells_indecies[1][j])
+        # if temp_cell.x == 0 and temp_cell.y == 0: print("Hooraaay!")
         uncaged_cells = np.append(uncaged_cells, temp_cell)
     while not np.all(caged_state):
         # if uncaged_cells.size==0:
@@ -37,6 +37,7 @@ def create_cages(board,size):
         cage_size = random.randint(1,4)
         cage = np.empty(0,np.int32)
         cell = uncaged_cells[0]
+        # print('uncaged cell x: {}, y: {}'.format(cell.x, cell.y))
         uncaged_cells = np.delete(uncaged_cells,0)
         caged_state[cell.x][cell.y] = True
         cage = np.append(cage,cell)
@@ -93,8 +94,11 @@ def generate(size):
     return final,board
 
 
-# cages = generate(100)
+# cages, solution = generate(4)
 # cells_count = 0
-# for i in cages:
-#     cells_count += len(i.cells)
+# # print(cages)
+# for cage in cages:
+#     # print(i.cells)
+#     cells_count += len(cage.cells)
+#     print('Cage operator: {} \t cage value: {} \t cage cells: {}'.format(cage.operator, cage.value, [(cell.x, cell.y) for cell in cage.cells]))
 # print(cells_count)
