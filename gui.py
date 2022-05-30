@@ -97,18 +97,18 @@ class PuzzleWindow(QDialog):
         # call generate function from generate.py
         self.cages,sol = generate(self.size)
 
-        # self.alg_box = QComboBox(self)
-        # self.alg_box.setGeometry(200, 150, 120, 30)
-        # alg_list = ["Backtracking", "Forward Checking", "Arc Consistency"]
-        # self.alg_box.addItems(alg_list)
-        # self.alg_box.setEditable(True)
-        # self.alg_box.setInsertPolicy(QComboBox.NoInsert)
-        # policy = self.alg_box.insertPolicy()
-        # label = QLabel("Insertion policy = " + str(policy), self)
-        # label.setGeometry(200, 100, 200, 30)
-
-        # self.alg_box.resize(40, 25)
-        # self.alg_box.move(int(self.width-150), int(self.height/2))
+        self.alg_box = QComboBox(self)
+        self.alg_box.resize(110, 25)
+        self.alg_box.move(int(self.width-170), int(self.height/4))
+        alg_list = ["Backtracking", "Forward Checking", "Arc Consistency"]
+        self.alg_box.addItems(alg_list)
+        self.alg_box.setEditable(True)
+        self.alg_box.setInsertPolicy(QComboBox.NoInsert)
+        policy = self.alg_box.insertPolicy()
+        print(str(policy))
+        self.label_1 = QLabel("Insertion policy = " + str(policy), self)
+        self.label_1.resize(110, 25)
+        self.label_1.move(int(self.width-170), int(self.height/5))
 
         self.spinbox = QSpinBox(self)
         self.spinbox.resize(75, 25)
@@ -126,7 +126,7 @@ class PuzzleWindow(QDialog):
 
                 self.x1 = self.label.x()
                 self.y1 = self.label.y()
-                self.x2 = self.x1
+                self.x2 = self.x1 + 40
                 self.y2 = self.y1 + 40
 
                 print(i, j, self.label.x(), self.label.y())
@@ -172,19 +172,20 @@ class PuzzleWindow(QDialog):
 
         self.button_reset.clicked.connect(self.reset_board)
 
-    # def paintEvent(self, e):
-    #     qp = QPainter()
-    #     qp.begin(self)
-    #     self.drawLines(qp)
-    #     qp.end()
+    def paintEvent(self, e):
+        qp = QPainter()
+        qp.begin(self)
+        self.drawLines(qp)
+        qp.end()
 
-    # def drawLines(self, qp):
-    #     painter = QPainter(self)
-    #     painter.setPen(Qt.red)
-    #     line = painter.drawLine(self.x1, self.y1, self.x2, self.y2)
-    #     if line not in self.lines:
-    #         self.lines.append(line)
-    #         self.update()
+    def drawLines(self, qp):
+        painter = QPainter(self)
+        painter.setPen(Qt.red)
+        line = painter.drawLine(self.x1, self.y1, self.x2, self.y2)
+        # QPainter.save()
+        # if line not in self.lines:
+        #     self.lines.append(line)
+        #     self.update()
 
     def generate_board(self):
         print("size: ", self.spinbox.text())
