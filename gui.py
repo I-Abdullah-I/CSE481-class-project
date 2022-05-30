@@ -75,8 +75,8 @@ class PuzzleWindow(QDialog):
     def __init__(self, size, parent=None):
         super().__init__(parent)
         self.title = 'KenKen Puzzle!'
-        self.left = 10
-        self.top = 10
+        self.left = 50
+        self.top = 50
         self.size = size
         self.solved_board = np.empty((0, self.size), np.int32) 
         self.cages = []
@@ -88,6 +88,7 @@ class PuzzleWindow(QDialog):
         self.x2 = 50
         self.y2 = 60
         self.lines = []
+        self.start = True
         self.drawBoard()
 
     def drawBoard(self):
@@ -95,6 +96,19 @@ class PuzzleWindow(QDialog):
         self.setGeometry(self.left, self.top, self.width, self.height)
         # call generate function from generate.py
         self.cages,sol = generate(self.size)
+
+        # self.alg_box = QComboBox(self)
+        # self.alg_box.setGeometry(200, 150, 120, 30)
+        # alg_list = ["Backtracking", "Forward Checking", "Arc Consistency"]
+        # self.alg_box.addItems(alg_list)
+        # self.alg_box.setEditable(True)
+        # self.alg_box.setInsertPolicy(QComboBox.NoInsert)
+        # policy = self.alg_box.insertPolicy()
+        # label = QLabel("Insertion policy = " + str(policy), self)
+        # label.setGeometry(200, 100, 200, 30)
+
+        # self.alg_box.resize(40, 25)
+        # self.alg_box.move(int(self.width-150), int(self.height/2))
 
         self.spinbox = QSpinBox(self)
         self.spinbox.resize(75, 25)
@@ -112,11 +126,11 @@ class PuzzleWindow(QDialog):
 
                 self.x1 = self.label.x()
                 self.y1 = self.label.y()
-                self.x2 = self.x1 + 40
+                self.x2 = self.x1
                 self.y2 = self.y1 + 40
 
                 print(i, j, self.label.x(), self.label.y())
-                self.label.setStyleSheet("border : solid blue;"
+                self.label.setStyleSheet("border : solid black;"
                                             "border-width : 1px 1px 1px 1px;")
 
                 self.labels.append(self.label)
@@ -125,7 +139,9 @@ class PuzzleWindow(QDialog):
         for cage in self.cages:
             if cage.operator == Operator.Constant:
                 print(cage.value)
-                self.label = self.labels[self.cages.index(cage)]
+                xIndex = cage.cells[0].x
+                yIndex = cage.cells[0].y
+                
                 self.label.setText("<div style='position:fixed;top:0;left:0;'><sup>{}</sup></div>".format(cage.value))
 
                 self.label.setStyleSheet("border : solid black;"
@@ -156,19 +172,19 @@ class PuzzleWindow(QDialog):
 
         self.button_reset.clicked.connect(self.reset_board)
 
-    def paintEvent(self, e):
-        qp = QPainter()
-        qp.begin(self)
-        self.drawLines(qp)
-        qp.end()
+    # def paintEvent(self, e):
+    #     qp = QPainter()
+    #     qp.begin(self)
+    #     self.drawLines(qp)
+    #     qp.end()
 
-    def drawLines(self, qp):
-        painter = QPainter(self)
-        painter.setPen(Qt.red)
-        line = painter.drawLine(self.x1, self.y1, self.x2, self.y2)
-        if line not in self.lines:
-            self.lines.append(line)
-            self.update()
+    # def drawLines(self, qp):
+    #     painter = QPainter(self)
+    #     painter.setPen(Qt.red)
+    #     line = painter.drawLine(self.x1, self.y1, self.x2, self.y2)
+    #     if line not in self.lines:
+    #         self.lines.append(line)
+    #         self.update()
 
     def generate_board(self):
         print("size: ", self.spinbox.text())
