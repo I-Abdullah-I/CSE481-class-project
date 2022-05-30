@@ -78,9 +78,9 @@ class PuzzleWindow(QDialog):
         self.left = 50
         self.top = 50
         self.size = size
-        self.solved_board = np.empty((0, self.size), np.int32) 
+        self.solved_board = None
         self.cages = []
-        self.labels = []
+        self.labels = np.empty((self.size,self.size),QLabel)
         self.width = (self.size + 6)*40
         self.height = (self.size + 2)*40
         self.x1 = 50
@@ -129,19 +129,19 @@ class PuzzleWindow(QDialog):
                 self.x2 = self.x1
                 self.y2 = self.y1 + 40
 
-                print(i, j, self.label.x(), self.label.y())
+                # print(i, j, self.label.x(), self.label.y())
                 self.label.setStyleSheet("border : solid black;"
                                             "border-width : 1px 1px 1px 1px;")
 
-                self.labels.append(self.label)
+                self.labels[i][j] = self.label
 
-
+        
         for cage in self.cages:
             if cage.operator == Operator.Constant:
-                print(cage.value)
                 xIndex = cage.cells[0].x
                 yIndex = cage.cells[0].y
-                
+                print("constant value:{} x:{}   y:{}".format(cage.value,xIndex,yIndex))
+                self.label = self.labels[yIndex][xIndex]
                 self.label.setText("<div style='position:fixed;top:0;left:0;'><sup>{}</sup></div>".format(cage.value))
 
                 self.label.setStyleSheet("border : solid black;"
@@ -195,19 +195,23 @@ class PuzzleWindow(QDialog):
     
     def solve_board(self):
         solved = solve(self.cages, self.size, 0)
-        self.solved_board = np.append(self.solved_board,solved)
+        self.solved_board = solved
+        print("abdo soln: {}".format(self.solved_board))
         self.fill()
 
     def fill(self):
-        for i in range(self.size * self.size):
-            self.label = self.labels[i]
-            self.label.setText("{}".format(self.solved_board[i]))
+        # print(self.solve_board.shape)
+        for i in range(self.size):
+            for j in range(self.size):
+                self.label = self.labels[j][i]
+                self.label.setText("{}".format(self.solved_board[i][j]))
 
 
     def reset_board(self):
-        for i in range(self.size * self.size):
-            self.label = self.labels[i]
-            self.label.setText(" ")
+        for i in range(self.size):
+            for j in range(self.size):
+                self.label = self.labels[i][j]
+                self.label.setText(" ")
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
