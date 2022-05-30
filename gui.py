@@ -1,70 +1,150 @@
 from ntpath import join
 import sys
+import enum
+import numpy as np
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-# from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QPushButton, QAction, QLineEdit, QMessageBox, QLabel, QSizePolicy
-# from PyQt5.QtGui import QIcon
-# from PyQt5.QtCore import pyqtSlot
+from Generate import generate
+from Utilities import solve
+
+class Operator(enum.Enum):
+    Add = 0
+    Subtract = 1
+    Multiply = 2
+    Divide = 3
+    Constant = 4
+
+class Cell:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.domain = np.empty((0),np.int32)
+
+class Cage:
+    def __init__(self, operator, value, cells=[]):
+        self.operator = operator
+        self.value = value
+        self.cells = cells
+
+# cages = [Cage(operator=Operator.Divide, value=2, cells=[Cell(0,0), Cell(1,0)])
+# , Cage(operator=Operator.Add, value=6, cells=[Cell(0,1), Cell(1,1),Cell(2,1)])
+# , Cage(operator=Operator.Subtract, value=1, cells=[Cell(0,2), Cell(0,3)])
+# , Cage(operator=Operator.Multiply, value=12, cells=[Cell(1,2), Cell(1,3), Cell(2,3)])
+# , Cage(operator=Operator.Constant, value=1, cells=[Cell(2,0)])
+# , Cage(operator=Operator.Add, value=5, cells=[Cell(3,2), Cell(2,2), Cell(3,3)])
+# , Cage(operator=Operator.Subtract, value=1, cells=[Cell(3,0), Cell(3,1)])]
 
 class App(QMainWindow):
-
     def __init__(self):
         super().__init__()
-        self.title = 'KenKen Puzzle'
+        self.title = 'Welcome to KenKen!'
         self.left = 10
         self.top = 10
         self.size = 4
         self.width = (self.size + 6)*40
         self.height = (self.size + 2)*40
-        self.initUI()
-    
-    def initUI(self):
+        self.welcomeUI()
+
+    def welcomeUI(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
-        self.size = 4
 
-        # Create textbox
-        self.textbox = QLineEdit(self)
-        self.textbox.move(self.width/1.45, self.height/2.2)
-        self.textbox.resize(100,25)
+        self.spinbox = QSpinBox(self)
+        self.spinbox.resize(100, 25)
+        self.spinbox.move(int(self.width/1.45), int(self.height/2.2))
+        self.spinbox.setRange(3, 100)
+
+        # Create generate button in the window
+        button_generate = QPushButton('Generate', self)
+        button_generate.move(int(self.width/1.45),int(self.height/1.76))
+        # connect button to function on_click
+        button_generate.clicked.connect(self.generate_on_click)
+        
+        self.show()
+    
+    @pyqtSlot()
+    def generate_on_click(self):
+        self.cams = PuzzleWindow(int(self.spinbox.text())) 
+        self.cams.show()
+        self.close()
+
+class PuzzleWindow(QDialog):
+    def __init__(self, size, parent=None):
+        super().__init__(parent)
+        self.title = 'KenKen Puzzle!'
+        self.left = 10
+        self.top = 10
+        self.size = size
+        self.solved_board = np.empty((0, self.size), np.int32) 
+        self.cages = []
+        self.labels = []
+        self.width = (self.size + 6)*40
+        self.height = (self.size + 2)*40
+        self.drawBoard()
+
+    def drawBoard(self):
+        self.setWindowTitle(self.title)
+        self.setGeometry(self.left, self.top, self.width, self.height)
 
         for i in range(self.size):
             for j in range(self.size):
                 self.label = QLabel("", self)
                 self.label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
                 self.label.setAlignment(Qt.AlignCenter)
-    
-                # setting up the border with different size
-                self.label.setStyleSheet("border : solid black;"
-                                        "border-width : 1px 1px 1px 1px;")
-                # for cage in cages:
-                #     self.label.setText("<sup>{}</sup>]".format(cage.operator, cage.value))
         
-                # resizing the label
                 self.label.resize(40, 40)
-        
-                # moving the label
                 self.label.move((i+1)*40, (j+1)*40)
+                self.label.setStyleSheet("border : solid black;"
+                                            "border-width : 1px 1px 1px 1px;")
 
+                self.labels.append(self.label)
+
+            # for cage in cages:
+            #     if cage.operator == Operator.Constant:
+            #         print(cage.value)
+            #         self.label.setText("<sup>{}</sup>".format(cage.value))
+            # else:
+            #     self.label.setText("<sup>{}</sup>]".format(cage.operator, cage.value))
+    
         
         # Create a button in the window
-        self.button = QPushButton('Generate', self)
-        self.button.move(self.width/1.45,self.height/1.76)
-        self.button = QPushButton('Slove', self)
-        self.button.move(self.width/1.45,self.height/1.47)
-        self.button = QPushButton('Clear', self)
-        self.button.move(self.width/1.45,self.height/1.26)
+        self.button_generate2 = QPushButton('Generate2', self)
+        self.button_generate2.move(int(self.width/1.45),int(self.height/1.76))
+
+        self.button_solve = QPushButton('Slove', self)
+        self.button_solve.move(int(self.width/1.45),int(self.height/1.47))
+
+        self.button_reset = QPushButton('Reset', self)
+        self.button_reset.move(int(self.width/1.45),int(self.height/1.26))
         
         # connect button to function on_click
-        self.button.clicked.connect(self.on_click)
+        self.button_generate2.clicked.connect(self.generate_board)
         self.show()
+
+        self.button_solve.clicked.connect(self.solve_board)
+        self.show()
+
+    def generate_board(self):
+        self.cages = generate(self.size)
+       
     
-    @pyqtSlot()
-    def on_click(self):
-        textboxValue = self.textbox.text()
-        QMessageBox.question(self, 'Message - pythonspot.com', "You typed: " + textboxValue, QMessageBox.Ok, QMessageBox.Ok)
-        self.textbox.setText("")
+    def solve_board(self):
+        solved = solve(self.cages, self.size, 0)
+        self.solved_board = np.append(self.solved_board,solved)
+        self.fill()
+        print()
+
+    def fill(self):
+        for i in range(self.size * self.size):
+            self.label = self.labels[i]
+            self.label.setText("{}".format(self.solved_board[i]))
+
+
+    # def goMainWindow(self):
+    #     self.cams = App()
+    #     self.cams.show()
+    #     self.close()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
