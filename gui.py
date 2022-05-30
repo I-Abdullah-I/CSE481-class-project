@@ -77,12 +77,13 @@ class App(QMainWindow):
 
 
         self.spinbox = QSpinBox(self)
-        self.spinbox.resize(100, 25)
+        self.spinbox.resize(75, 25)
         self.spinbox.move(int(self.width/1.45), int(self.height/2.2))
         self.spinbox.setRange(3, 100)
 
         # Create generate button in the window
         button_start = QPushButton('Start', self)
+        button_start.resize(75, 25)
         button_start.move(int(self.width/1.45),int(self.height/1.76))
         # connect button to function on_click
         button_start.clicked.connect(self.start_on_click)
@@ -113,12 +114,12 @@ class PuzzleWindow(QDialog):
     def drawBoard(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
-
+        # call generate function from generate.py
         self.cages,sol = generate(self.size)
 
         self.spinbox = QSpinBox(self)
-        self.spinbox.resize(100, 25)
-        self.spinbox.move(int(self.width/1.45), int(self.height/2.2))
+        self.spinbox.resize(75, 25)
+        self.spinbox.move(int(self.width-150), int(self.height/2.2))
         self.spinbox.setRange(3, 100)
 
         for i in range(self.size):
@@ -134,23 +135,29 @@ class PuzzleWindow(QDialog):
 
                 self.labels.append(self.label)
 
-            # for cage in cages:
-            #     if cage.operator == Operator.Constant:
-            #         print(cage.value)
-            #         self.label.setText("<sup>{}</sup>".format(cage.value))
+        for cage in self.cages:
+            if cage.operator == Operator.Constant:
+                print(cage.value)
+                self.label = self.labels[cage]
+                self.label.setText("<sup>{}</sup>".format(cage.value))
+                self.label.setStyleSheet("border : solid black;"
+                                            "border-width : 2px 2px 2px 2px;")
             # else:
             #     self.label.setText("<sup>{}</sup>]".format(cage.operator, cage.value))
-    
+        
         
         # Create a button in the window
         self.button_generate = QPushButton('New Board', self)
-        self.button_generate.move(int(self.width/1.45),int(self.height/1.76))
+        self.button_generate.resize(75, 25)
+        self.button_generate.move(int(self.width-150),int(self.height/1.76))
 
         self.button_solve = QPushButton('Slove', self)
-        self.button_solve.move(int(self.width/1.45),int(self.height/1.47))
+        self.button_solve.resize(75, 25)
+        self.button_solve.move(int(self.width-150),int(self.height/1.47))
 
         self.button_reset = QPushButton('Reset', self)
-        self.button_reset.move(int(self.width/1.45),int(self.height/1.26))
+        self.button_reset.resize(75, 25)
+        self.button_reset.move(int(self.width-150),int(self.height/1.26))
         
         # connect button to function on_click
         self.button_generate.clicked.connect(self.generate_board)
