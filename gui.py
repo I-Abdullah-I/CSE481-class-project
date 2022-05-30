@@ -114,6 +114,8 @@ class PuzzleWindow(QDialog):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
 
+        self.cages,sol = generate(self.size)
+
         self.spinbox = QSpinBox(self)
         self.spinbox.resize(100, 25)
         self.spinbox.move(int(self.width/1.45), int(self.height/2.2))
@@ -161,7 +163,6 @@ class PuzzleWindow(QDialog):
 
     def generate_board(self):
         print("size: ", self.spinbox.text())
-        self.cages,sol = generate(self.size)
         self.cams = PuzzleWindow(int(self.spinbox.text())) 
         self.cams.show()
         self.close()
