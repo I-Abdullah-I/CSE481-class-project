@@ -2,7 +2,7 @@ from msilib.schema import Class
 from webbrowser import Opera
 import numpy as np
 import random
-from Utilities import Cell,SubCage,Operator
+from Utilities import Cell,Cage,Operator
 from random import randint,choice
 import math
 def Initiate(size):
@@ -62,7 +62,7 @@ def create_cages(board,size):
         if cage_size == 1:
             cell = cage[0]
             # if constant_cages_num <= round(math.sqrt(size)) or adj_flag == 0:
-            subcage = SubCage(Operator.Constant,board[cell.x][cell.y],cage)
+            subcage = Cage(Operator.Constant,board[cell.x][cell.y],cage)
             # else:
             #     caged_state[cell.x][cell.y] = False
             #     uncaged_cells = np.append(uncaged_cells,cell)
@@ -73,9 +73,9 @@ def create_cages(board,size):
             max1 = max(first,second)
             min1 = min(first,second)
             if max1 % min1 == 0 :
-                subcage = SubCage(Operator.Divide,max1/min1,cage)
+                subcage = Cage(Operator.Divide,max1/min1,cage)
             else:
-                subcage = SubCage(Operator.Subtract,max1-min1,cage)
+                subcage = Cage(Operator.Subtract,max1-min1,cage)
         else:
             op = choice([Operator.Add,Operator.Multiply])
             values = [board[h.x][h.y] for h in cage]
@@ -83,15 +83,18 @@ def create_cages(board,size):
                 value = sum(values)
             else:
                 value = math.prod(values)
-            subcage = SubCage(op,value,cage)
+            subcage = Cage(op,value,cage)
         main_cages.append(subcage)
     return main_cages
 
-size = 100
+def generate(size):
+    board = Initiate(size)
+    final = create_cages(board,size)
+    return final
 
-board = Initiate(size)
-cages = create_cages(board,size)
-cells_count_in_cages = 0
-for i in cages:
-    cells_count_in_cages += len(i.cells)
-print(cells_count_in_cages)
+
+# cages = generate(100)
+# cells_count = 0
+# for i in cages:
+#     cells_count += len(i.cells)
+# print(cells_count)
