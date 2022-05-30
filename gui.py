@@ -8,33 +8,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from Generate import generate
 from Utilities import solve
-
-class Operator(enum.Enum):
-    Add = 0
-    Subtract = 1
-    Multiply = 2
-    Divide = 3
-    Constant = 4
-
-class Cell:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.domain = np.empty((0),np.int32)
-
-class Cage:
-    def __init__(self, operator, value, cells=[]):
-        self.operator = operator
-        self.value = value
-        self.cells = cells
-
-# cages = [Cage(operator=Operator.Divide, value=2, cells=[Cell(0,0), Cell(1,0)])
-# , Cage(operator=Operator.Add, value=6, cells=[Cell(0,1), Cell(1,1),Cell(2,1)])
-# , Cage(operator=Operator.Subtract, value=1, cells=[Cell(0,2), Cell(0,3)])
-# , Cage(operator=Operator.Multiply, value=12, cells=[Cell(1,2), Cell(1,3), Cell(2,3)])
-# , Cage(operator=Operator.Constant, value=1, cells=[Cell(2,0)])
-# , Cage(operator=Operator.Add, value=5, cells=[Cell(3,2), Cell(2,2), Cell(3,3)])
-# , Cage(operator=Operator.Subtract, value=1, cells=[Cell(3,0), Cell(3,1)])]
+from main_utilities import *
 
 class App(QMainWindow):
     def __init__(self):
@@ -126,7 +100,7 @@ class PuzzleWindow(QDialog):
             for j in range(self.size):
                 self.label = QLabel("", self)
                 self.label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-                self.label.setAlignment(Qt.AlignCenter)
+                # self.label.setAlignment(Qt.AlignLeft)
         
                 self.label.resize(40, 40)
                 self.label.move((i+1)*40, (j+1)*40)
@@ -138,8 +112,9 @@ class PuzzleWindow(QDialog):
         for cage in self.cages:
             if cage.operator == Operator.Constant:
                 print(cage.value)
-                self.label = self.labels[cage]
-                self.label.setText("<sup>{}</sup>".format(cage.value))
+                self.label = self.labels[self.cages.index(cage)]
+                self.label.setText("<div style='position:fixed;top:0;left:0;'><sup>{}</sup></div>".format(cage.value))
+
                 self.label.setStyleSheet("border : solid black;"
                                             "border-width : 2px 2px 2px 2px;")
             # else:
