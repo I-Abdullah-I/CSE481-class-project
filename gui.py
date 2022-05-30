@@ -126,7 +126,7 @@ class PuzzleWindow(QDialog):
         self.show()
 
     def generate_board(self):
-        self.cages = generate(self.size)
+        self.cages,sol = generate(self.size)
        
     
     def solve_board(self):
