@@ -90,7 +90,7 @@ def create_cages(board,size):
 def generate(size):
     board = Initiate(size)
     final = create_cages(board,size)
-    return final
+    return final,board
 
 
 # cages = generate(100)
