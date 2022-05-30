@@ -198,14 +198,14 @@ def solve(cages, size, algorithm):
 # board.fill_freebie()
 # board.solve_with_backtracking()
 
-"""Random Testcase"""
-size = 4
-cages, solution = generate(size)
-cells_count = 0
-for cage in cages:
-#     print(type(cage.cells[0]))
-    cells_count += len(cage.cells)
-    print('Cage operator: {} \t cage value: {} \t cage cells: {}'.format(cage.operator, cage.value, [(cell.x, cell.y) for cell in cage.cells]))
-print(cells_count)
-print("Solution\n", solution)
-print("My solution:\n", solve(cages, size, 0))
+# """Random Testcase"""
+# size = 4
+# cages, solution = generate(size)
+# cells_count = 0
+# for cage in cages:
+    # print(type(cage.cells[0]))
+    # cells_count += len(cage.cells)
+    # print('Cage operator: {} \t cage value: {} \t cage cells: {}'.format(cage.operator, cage.value, [(cell.x, cell.y) for cell in cage.cells]))
+# print(cells_count)
+# print("Solution\n", solution)
+# print("My solution:\n", solve(cages, size, 0))
