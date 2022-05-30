@@ -1,6 +1,7 @@
 from ntpath import join
 import sys
 import enum
+from tkinter import Spinbox
 import numpy as np
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -50,21 +51,47 @@ class App(QMainWindow):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
 
+        self.welcome_label = QLabel("Welcome to", self)
+        self.kenken_label = QLabel("KENKEN", self)
+
+        QFontDatabase.addApplicationFont("PressStart2P-Regular.ttf")
+        self.welcome_label.setFont(QFont('Press Start 2P', 10))
+        self.kenken_label.setFont(QFont('Press Start 2P', 22))
+
+        self.welcome_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.kenken_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        self.welcome_label.setAlignment(Qt.AlignCenter)
+        self.kenken_label.setAlignment(Qt.AlignCenter)
+
+        self.welcome_label.resize(self.width-200, self.height-75)
+        self.kenken_label.resize(self.width-200, self.height-75)
+
+        self.welcome_label.move(40, 40)
+        self.kenken_label.move(40, 80)
+
+        self.welcome_label.setStyleSheet("border: solid gray; color: solid gray;"
+                                    "border-width: 3px 3px 3px 3px;")
+        self.kenken_label.setStyleSheet("color: red;")
+
+
+
         self.spinbox = QSpinBox(self)
         self.spinbox.resize(100, 25)
         self.spinbox.move(int(self.width/1.45), int(self.height/2.2))
         self.spinbox.setRange(3, 100)
 
         # Create generate button in the window
-        button_generate = QPushButton('Generate', self)
-        button_generate.move(int(self.width/1.45),int(self.height/1.76))
+        button_start = QPushButton('Start', self)
+        button_start.move(int(self.width/1.45),int(self.height/1.76))
         # connect button to function on_click
-        button_generate.clicked.connect(self.generate_on_click)
+        button_start.clicked.connect(self.start_on_click)
         
         self.show()
     
     @pyqtSlot()
-    def generate_on_click(self):
+    def start_on_click(self):
+        print("size: ", self.spinbox.text())
         self.cams = PuzzleWindow(int(self.spinbox.text())) 
         self.cams.show()
         self.close()
@@ -86,6 +113,11 @@ class PuzzleWindow(QDialog):
     def drawBoard(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
+
+        self.spinbox = QSpinBox(self)
+        self.spinbox.resize(100, 25)
+        self.spinbox.move(int(self.width/1.45), int(self.height/2.2))
+        self.spinbox.setRange(3, 100)
 
         for i in range(self.size):
             for j in range(self.size):
@@ -109,8 +141,8 @@ class PuzzleWindow(QDialog):
     
         
         # Create a button in the window
-        self.button_generate2 = QPushButton('Generate2', self)
-        self.button_generate2.move(int(self.width/1.45),int(self.height/1.76))
+        self.button_generate = QPushButton('New Board', self)
+        self.button_generate.move(int(self.width/1.45),int(self.height/1.76))
 
         self.button_solve = QPushButton('Slove', self)
         self.button_solve.move(int(self.width/1.45),int(self.height/1.47))
@@ -119,21 +151,26 @@ class PuzzleWindow(QDialog):
         self.button_reset.move(int(self.width/1.45),int(self.height/1.26))
         
         # connect button to function on_click
-        self.button_generate2.clicked.connect(self.generate_board)
+        self.button_generate.clicked.connect(self.generate_board)
         self.show()
 
         self.button_solve.clicked.connect(self.solve_board)
         self.show()
 
+        self.button_reset.clicked.connect(self.reset_board)
+
     def generate_board(self):
+        print("size: ", self.spinbox.text())
         self.cages,sol = generate(self.size)
+        self.cams = PuzzleWindow(int(self.spinbox.text())) 
+        self.cams.show()
+        self.close()
        
     
     def solve_board(self):
         solved = solve(self.cages, self.size, 0)
         self.solved_board = np.append(self.solved_board,solved)
         self.fill()
-        print()
 
     def fill(self):
         for i in range(self.size * self.size):
@@ -141,10 +178,10 @@ class PuzzleWindow(QDialog):
             self.label.setText("{}".format(self.solved_board[i]))
 
 
-    # def goMainWindow(self):
-    #     self.cams = App()
-    #     self.cams.show()
-    #     self.close()
+    def reset_board(self):
+        for i in range(self.size * self.size):
+            self.label = self.labels[i]
+            self.label.setText(" ")
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
