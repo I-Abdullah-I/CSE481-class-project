@@ -2,6 +2,7 @@ from ntpath import join
 import sys
 import enum
 from tkinter import Spinbox
+from webbrowser import Opera
 import numpy as np
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -81,6 +82,7 @@ class PuzzleWindow(QDialog):
         self.solved_board = None
         self.cages = []
         self.labels = np.empty((self.size,self.size),QLabel)
+        self.operator = '#'
         self.width = (self.size + 6)*40
         self.height = (self.size + 2)*40
         self.x1 = 50
@@ -88,7 +90,7 @@ class PuzzleWindow(QDialog):
         self.x2 = 50
         self.y2 = 60
         self.lines = []
-        self.start = True
+        self.algorithm = 0
         self.drawBoard()
 
     def drawBoard(self):
@@ -99,20 +101,15 @@ class PuzzleWindow(QDialog):
 
         self.alg_box = QComboBox(self)
         self.alg_box.resize(110, 25)
-        self.alg_box.move(int(self.width-170), int(self.height/4))
+        self.alg_box.move(int(self.width-170),int(self.height/1.9))
         alg_list = ["Backtracking", "Forward Checking", "Arc Consistency"]
         self.alg_box.addItems(alg_list)
         self.alg_box.setEditable(True)
-        self.alg_box.setInsertPolicy(QComboBox.NoInsert)
-        policy = self.alg_box.insertPolicy()
-        print(str(policy))
-        self.label_1 = QLabel("Insertion policy = " + str(policy), self)
-        self.label_1.resize(110, 25)
-        self.label_1.move(int(self.width-170), int(self.height/5))
+        self.alg_box.currentIndexChanged.connect(self.algorithm_change)
 
         self.spinbox = QSpinBox(self)
         self.spinbox.resize(75, 25)
-        self.spinbox.move(int(self.width-150), int(self.height/2.2))
+        self.spinbox.move(int(self.width-150), int(self.height/4))
         self.spinbox.setRange(3, 100)
 
         for i in range(self.size):
@@ -140,24 +137,37 @@ class PuzzleWindow(QDialog):
             if cage.operator == Operator.Constant:
                 xIndex = cage.cells[0].x
                 yIndex = cage.cells[0].y
-                print("constant value:{} x:{}   y:{}".format(cage.value,xIndex,yIndex))
+                # print("constant value:{} x:{}   y:{}".format(cage.value,xIndex,yIndex))
                 self.label = self.labels[yIndex][xIndex]
                 self.label.setText("<div style='position:fixed;top:0;left:0;'><sup>{}</sup></div>".format(cage.value))
 
                 self.label.setStyleSheet("border : solid black;"
                                             "border-width : 2px 2px 2px 2px;")
             # else:
-            #     self.label.setText("<sup>{}</sup>]".format(cage.operator, cage.value))
+            #     if cage.operator == Operator.Add:
+            #         self.operator == '+'
+            #     elif cage.operator == Operator.Subtract:
+            #         self.operator == '-'
+            #     elif cage.operator == Operator.Multiply:
+            #         self.operator == '*'
+            #     elif cage.operator == Operator.Divide:
+            #         self.operator == '÷'
+
+            #     xIndex = cage.cells[0].x
+            #     yIndex = cage.cells[0].y
+            #     self.label = self.labels[yIndex][xIndex]
+            #     self.label.setText("<div style='position:fixed;top:0;left:0;'><sup>{}</div>".format(cage.value))
+                
         
         
         # Create a button in the window
         self.button_generate = QPushButton('New Board', self)
         self.button_generate.resize(75, 25)
-        self.button_generate.move(int(self.width-150),int(self.height/1.76))
+        self.button_generate.move(int(self.width-150), int(self.height/2.7))
 
         self.button_solve = QPushButton('Slove', self)
         self.button_solve.resize(75, 25)
-        self.button_solve.move(int(self.width-150),int(self.height/1.47))
+        self.button_solve.move(int(self.width-150),int(self.height/1.55))
 
         self.button_reset = QPushButton('Reset', self)
         self.button_reset.resize(75, 25)
@@ -187,17 +197,22 @@ class PuzzleWindow(QDialog):
         #     self.lines.append(line)
         #     self.update()
 
+    def algorithm_change(self, i):
+        self.algorithm = i
+
+
     def generate_board(self):
-        print("size: ", self.spinbox.text())
+        # print("size: ", self.spinbox.text())
         self.cams = PuzzleWindow(int(self.spinbox.text())) 
         self.cams.show()
         self.close()
        
     
     def solve_board(self):
-        solved = solve(self.cages, self.size, 0)
+        # print(self.algorithm)
+        solved = solve(self.cages, self.size, self.algorithm)
         self.solved_board = solved
-        print("abdo soln: {}".format(self.solved_board))
+        # print("abdo soln: {}".format(self.solved_board))
         self.fill()
 
     def fill(self):
