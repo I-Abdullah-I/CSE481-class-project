@@ -3,6 +3,7 @@ import sys
 import enum
 from tkinter import Spinbox
 from webbrowser import Opera
+from cv2 import multiply, subtract
 import numpy as np
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -92,7 +93,11 @@ class PuzzleWindow(QDialog):
         self.lines = []
         self.algorithm = 0
         self.drawBoard()
-
+    def set_operator_value(self,op,value,cells,color):
+        for cell in cells:
+            self.label = self.labels[cell.y][cell.x]
+            self.label.setText("<div style='position:fixed;top:0;left:0;'><sup>{}</sup><sup>{}</sup></div>".format(op,value))
+            self.label.setStyleSheet("border : solid {};""border-width : 2px 2px 2px 2px;".format(color))
     def drawBoard(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
@@ -134,29 +139,21 @@ class PuzzleWindow(QDialog):
 
         
         for cage in self.cages:
-            if cage.operator == Operator.Constant:
-                xIndex = cage.cells[0].x
-                yIndex = cage.cells[0].y
-                # print("constant value:{} x:{}   y:{}".format(cage.value,xIndex,yIndex))
-                self.label = self.labels[yIndex][xIndex]
+            xIndex = cage.cells[0].x
+            yIndex = cage.cells[0].y
+            self.label = self.labels[yIndex][xIndex]
+            op = cage.operator
+            if op == Operator.Constant:
                 self.label.setText("<div style='position:fixed;top:0;left:0;'><sup>{}</sup></div>".format(cage.value))
-
-                self.label.setStyleSheet("border : solid black;"
-                                            "border-width : 2px 2px 2px 2px;")
-            # else:
-            #     if cage.operator == Operator.Add:
-            #         self.operator == '+'
-            #     elif cage.operator == Operator.Subtract:
-            #         self.operator == '-'
-            #     elif cage.operator == Operator.Multiply:
-            #         self.operator == '*'
-            #     elif cage.operator == Operator.Divide:
-            #         self.operator == '÷'
-
-            #     xIndex = cage.cells[0].x
-            #     yIndex = cage.cells[0].y
-            #     self.label = self.labels[yIndex][xIndex]
-            #     self.label.setText("<div style='position:fixed;top:0;left:0;'><sup>{}</div>".format(cage.value))
+                self.label.setStyleSheet("border : solid black;""border-width : 2px 2px 2px 2px;")
+            elif op == Operator.Add:
+                self.set_operator_value("+",cage.value,cage.cells,"red")
+            elif op == Operator.Subtract:
+                self.set_operator_value("-",cage.value,cage.cells,"yellow")
+            elif op == Operator.Multiply:
+                self.set_operator_value("*",cage.value,cage.cells,"blue")
+            elif op == Operator.Divide:
+                self.set_operator_value("/",cage.value,cage.cells,"purple")
                 
         
         
