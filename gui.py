@@ -16,8 +16,8 @@ class App(QMainWindow):
     def __init__(self):
         super().__init__()
         self.title = 'Welcome to KenKen!'
-        self.left = 800
-        self.top = 300
+        self.left = 500
+        self.top = 200
         self.size = 4
         self.width = (self.size + 6)*40
         self.height = (self.size + 2)*40
@@ -68,7 +68,7 @@ class App(QMainWindow):
     
     @pyqtSlot()
     def start_on_click(self):
-        print("size: ", self.spinbox.text())
+        # print("size: ", self.spinbox.text())
         self.cams = PuzzleWindow(int(self.spinbox.text())) 
         self.cams.show()
         self.close()
@@ -76,7 +76,7 @@ class App(QMainWindow):
 class PuzzleWindow(QDialog):
     def __init__(self, size, parent=None):
         super().__init__(parent)
-        self.color_space = ['#00FFFF','red','yellow','purple','#7FFFD4','orange','brown','green','pink']
+        self.color_space = ['#4A96D3','#88D5FE','red','orange','purple','#F5CC00','#CE9178','#4CC49F','#DA6BC7', 'gray']
         self.title = 'KenKen Puzzle!'
         self.left = 800
         self.top = 300
@@ -94,7 +94,9 @@ class PuzzleWindow(QDialog):
         self.lines = []
         self.algorithm = 0
         self.counter = 0
+        self.filled = 0
         self.drawBoard()
+
     def set_operator_value(self,op,value,cells,color):
         min_cell = cells[0]
         for cell in cells:
@@ -161,7 +163,7 @@ class PuzzleWindow(QDialog):
             elif op == Operator.Multiply:
                 self.set_operator_value("*",cage.value,cage.cells,"blue")
             elif op == Operator.Divide:
-                self.set_operator_value("÷",cage.value,cage.cells,"purple")
+                self.set_operator_value("÷",int(cage.value),cage.cells,"purple")
                 
         
         
@@ -222,6 +224,7 @@ class PuzzleWindow(QDialog):
 
     def fill(self):
         # print(self.solve_board.shape)
+        self.filled = 1
         for i in range(self.size):
             for j in range(self.size):
                 self.label = self.labels[j][i]
@@ -232,10 +235,14 @@ class PuzzleWindow(QDialog):
 
 
     def reset_board(self):
-        for i in range(self.size):
-            for j in range(self.size):
-                self.label = self.labels[i][j]
-                self.label.setText(" ")
+        if self.filled == 1:
+            self.filled = 0
+
+            for i in range(self.size):
+                for j in range(self.size):
+                    self.label = self.labels[i][j]
+                    prev = self.label.text()
+                    self.label.setText(prev[:-len(str("<div style='font-size:30px;text-align:center;'>{}</div>".format(self.solved_board[i][j])))])
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
