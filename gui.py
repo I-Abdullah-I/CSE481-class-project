@@ -76,6 +76,7 @@ class App(QMainWindow):
 class PuzzleWindow(QDialog):
     def __init__(self, size, parent=None):
         super().__init__(parent)
+        self.color_space = ['#00FFFF','red','yellow','purple','black','orange','brown','green','pink']
         self.title = 'KenKen Puzzle!'
         self.left = 50
         self.top = 50
@@ -92,12 +93,19 @@ class PuzzleWindow(QDialog):
         self.y2 = 60
         self.lines = []
         self.algorithm = 0
+        self.counter = 0
         self.drawBoard()
     def set_operator_value(self,op,value,cells,color):
+        min_cell = cells[0]
+        for cell in cells:
+            if cell.x < min_cell.x and cell.y < min_cell.y:
+                min_cell = cell
+        self.label = self.labels[min_cell.y][min_cell.x]
+        self.label.setText("<div style='position:fixed;top:0;left:0;'><sup>{}</sup><sup>{}</sup></div>".format(op,value))
         for cell in cells:
             self.label = self.labels[cell.y][cell.x]
-            self.label.setText("<div style='position:fixed;top:0;left:0;'><sup>{}</sup><sup>{}</sup></div>".format(op,value))
-            self.label.setStyleSheet("border : solid {};""border-width : 2px 2px 2px 2px;".format(color))
+            self.label.setStyleSheet("border : solid {};""border-width : 2px 2px 2px 2px;".format(self.color_space[self.counter]))
+        self.counter += 1 % len(self.color_space)
     def drawBoard(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
@@ -179,16 +187,16 @@ class PuzzleWindow(QDialog):
 
         self.button_reset.clicked.connect(self.reset_board)
 
-    def paintEvent(self, e):
-        qp = QPainter()
-        qp.begin(self)
-        self.drawLines(qp)
-        qp.end()
+    # def paintEvent(self, e):
+    #     qp = QPainter()
+    #     qp.begin(self)
+    #     self.drawLines(qp)
+    #     qp.end()
 
-    def drawLines(self, qp):
-        painter = QPainter(self)
-        painter.setPen(Qt.red)
-        line = painter.drawLine(self.x1, self.y1, self.x2, self.y2)
+    # def drawLines(self, qp):
+    #     painter = QPainter(self)
+    #     painter.setPen(Qt.red)
+    #     line = painter.drawLine(self.x1, self.y1, self.x2, self.y2)
         # QPainter.save()
         # if line not in self.lines:
         #     self.lines.append(line)
