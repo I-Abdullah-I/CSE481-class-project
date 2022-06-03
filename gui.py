@@ -105,7 +105,7 @@ class PuzzleWindow(QDialog):
         for cell in cells:
             self.label = self.labels[cell.y][cell.x]
             self.label.setStyleSheet("border : solid {};""border-width : 2px 2px 2px 2px;".format(self.color_space[self.counter]))
-        self.counter += 1 % len(self.color_space)
+        self.counter = (self.counter+ 1) % len(self.color_space)
     def drawBoard(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
@@ -113,7 +113,7 @@ class PuzzleWindow(QDialog):
         self.cages,sol = generate(self.size)
 
         self.alg_box = QComboBox(self)
-        self.alg_box.resize(110, 25)
+        self.alg_box.resize(130, 25)
         self.alg_box.move(int(self.width-170),int(self.height/1.9))
         alg_list = ["Backtracking", "Forward Checking", "Arc Consistency"]
         self.alg_box.addItems(alg_list)

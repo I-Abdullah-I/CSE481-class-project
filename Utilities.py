@@ -379,12 +379,12 @@ def solve(cages, size, algorithm):
     if algorithm == 0:
         board.fill_freebie(algorithm)
         board.solve_with_backtracking()
-        print("My solution:\n", board.mstate)
+        # print("My solution:\n", board.mstate)
         return board.mstate
     elif algorithm == 1:
         board.fill_freebie(algorithm)
         board.solve_with_backtracking_and_forward_checking(board.mDomain)
-        print("My solution:\n", board.mstate)
+        # print("My solution:\n", board.mstate)
         return board.mstate
     elif algorithm == 2:
         board.solve_with_backtracking(arc_consistency=True)
