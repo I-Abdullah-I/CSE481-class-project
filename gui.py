@@ -16,8 +16,8 @@ class App(QMainWindow):
     def __init__(self):
         super().__init__()
         self.title = 'Welcome to KenKen!'
-        self.left = 10
-        self.top = 10
+        self.left = 800
+        self.top = 300
         self.size = 4
         self.width = (self.size + 6)*40
         self.height = (self.size + 2)*40
@@ -76,17 +76,17 @@ class App(QMainWindow):
 class PuzzleWindow(QDialog):
     def __init__(self, size, parent=None):
         super().__init__(parent)
-        self.color_space = ['#00FFFF','red','yellow','purple','black','orange','brown','green','pink']
+        self.color_space = ['#00FFFF','red','yellow','purple','#7FFFD4','orange','brown','green','pink']
         self.title = 'KenKen Puzzle!'
-        self.left = 50
-        self.top = 50
+        self.left = 800
+        self.top = 300
         self.size = size
         self.solved_board = None
         self.cages = []
         self.labels = np.empty((self.size,self.size),QLabel)
         self.operator = '#'
-        self.width = (self.size + 6)*40
-        self.height = (self.size + 2)*40
+        self.width = (self.size + 6)*60
+        self.height = (self.size + 2)*60
         self.x1 = 50
         self.y1 = 50
         self.x2 = 50
@@ -101,7 +101,7 @@ class PuzzleWindow(QDialog):
             if cell.x < min_cell.x and cell.y < min_cell.y:
                 min_cell = cell
         self.label = self.labels[min_cell.y][min_cell.x]
-        self.label.setText("<div style='position:fixed;top:0;left:0;'><sup>{}</sup><sup>{}</sup></div>".format(op,value))
+        self.label.setText("<div style='position:fixed;top:0;left:0;font-size:20px;'><sup>{}</sup><sup>{}</sup></div>".format(op,value))
         for cell in cells:
             self.label = self.labels[cell.y][cell.x]
             self.label.setStyleSheet("border : solid {};""border-width : 2px 2px 2px 2px;".format(self.color_space[self.counter]))
@@ -131,8 +131,8 @@ class PuzzleWindow(QDialog):
                 self.label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
                 # self.label.setAlignment(Qt.AlignLeft)
         
-                self.label.resize(40, 40)
-                self.label.move((i+1)*40, (j+1)*40)
+                self.label.resize(60, 60)
+                self.label.move((i+1)*60, (j+1)*60)
 
                 self.x1 = self.label.x()
                 self.y1 = self.label.y()
@@ -152,7 +152,7 @@ class PuzzleWindow(QDialog):
             self.label = self.labels[yIndex][xIndex]
             op = cage.operator
             if op == Operator.Constant:
-                self.label.setText("<div style='position:fixed;top:0;left:0;'><sup>{}</sup></div>".format(cage.value))
+                self.label.setText("<div style='position:fixed;top:0;left:0;font-size:20px;'><sup>{}</sup></div>".format(cage.value))
                 self.label.setStyleSheet("border : solid black;""border-width : 2px 2px 2px 2px;")
             elif op == Operator.Add:
                 self.set_operator_value("+",cage.value,cage.cells,"red")
@@ -161,7 +161,7 @@ class PuzzleWindow(QDialog):
             elif op == Operator.Multiply:
                 self.set_operator_value("*",cage.value,cage.cells,"blue")
             elif op == Operator.Divide:
-                self.set_operator_value("/",cage.value,cage.cells,"purple")
+                self.set_operator_value("÷",cage.value,cage.cells,"purple")
                 
         
         
@@ -225,7 +225,10 @@ class PuzzleWindow(QDialog):
         for i in range(self.size):
             for j in range(self.size):
                 self.label = self.labels[j][i]
-                self.label.setText("{}".format(self.solved_board[i][j]))
+                if(self.label.text() == ''):
+                    self.label.setText("<div style='position:fixed;top:0;left:0;font-size:20px;color:#f0f0f0;'><sup>3-</sup></div>")
+                self.label.setText(self.label.text() + "<div style='font-size:30px;text-align:center;'>{}</div>".format(self.solved_board[i][j]))
+                
 
 
     def reset_board(self):
