@@ -406,14 +406,29 @@ def Diff(li1, li2):
 
 
 """Random Testcase"""
-size = 3
-cages, solution = generate(size)
-cells_count = 0
-for cage in cages:
-    cells_count += len(cage.cells)
-    print('Cage operator: {} \t cage value: {} \t\t cage cells: {}'.format(cage.operator, cage.value, [(cell.x, cell.y) for cell in cage.cells]))
-print(cells_count)
-print("Solution\n", solution)
-t1 = datetime.now()
-print("My solution:\n", solve(cages, size, 0))
-print(datetime.now() - t1)
+# size = 3
+# cages, solution = generate(size)
+# cells_count = 0
+# for cage in cages:
+#     cells_count += len(cage.cells)
+#     print('Cage operator: {} \t cage value: {} \t\t cage cells: {}'.format(cage.operator, cage.value, [(cell.x, cell.y) for cell in cage.cells]))
+# print(cells_count)
+# print("Solution\n", solution)
+# t1 = datetime.now()
+# print("My solution:\n", solve(cages, size, 0))
+# print(datetime.now() - t1)
+
+"""Random n boards testcase"""
+
+# size = 6
+# n = 100
+# algorithms = ['Bactracking','Forward Checking' , 'Arc Consistency']
+# algorithm = 2
+# boards,solutions = generate_n_boards(n,size)
+# # print(type(boards[0][0]))
+# my_solutions = []
+# time1 = datetime.now()
+# for board in boards:
+#     my_solutions.append(solve(board,size,algorithm))
+# time2 = datetime.now()
+# print("algorithm used: {}    total_time: {}   number of boards: {}    size of each board: {}".format(algorithms[algorithm],time2-time1,n,size))
