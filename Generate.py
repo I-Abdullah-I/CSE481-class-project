@@ -93,7 +93,12 @@ def generate(size):
     final = create_cages(board,size)
     return final,board
 
+def generate_n_boards(n,size):
 
+    boards = []
+    for i in range(n):
+        boards.append(generate(size))
+    return boards
 # cages, solution = generate(4)
 # cells_count = 0
 # # print(cages)
