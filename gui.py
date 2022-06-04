@@ -16,8 +16,6 @@ class App(QMainWindow):
     def __init__(self):
         super().__init__()
         self.title = 'Welcome to KenKen!'
-        self.left = 500
-        self.top = 200
         self.size = 4
         self.width = (self.size + 6)*40
         self.height = (self.size + 2)*40
@@ -25,7 +23,11 @@ class App(QMainWindow):
 
     def welcomeUI(self):
         self.setWindowTitle(self.title)
-        self.setGeometry(self.left, self.top, self.width, self.height)
+        self.resize(self.width, self.height)
+        qr = self.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
 
         self.welcome_label = QLabel("Welcome to", self)
         self.kenken_label = QLabel("KENKEN", self)
@@ -76,22 +78,15 @@ class App(QMainWindow):
 class PuzzleWindow(QDialog):
     def __init__(self, size, parent=None):
         super().__init__(parent)
-        self.color_space = ['#4A96D3','#88D5FE','red','orange','purple','#F5CC00','#CE9178','#4CC49F','#DA6BC7', 'gray']
+        self.color_space = ['#4A96D3','#88D5FE','red','orange','purple',
+                            '#F5CC00','#CE9178','#4CC49F','#DA6BC7','gray']
         self.title = 'KenKen Puzzle!'
-        self.left = 800
-        self.top = 300
         self.size = size
         self.solved_board = None
         self.cages = []
         self.labels = np.empty((self.size,self.size),QLabel)
-        self.operator = '#'
         self.width = (self.size + 6)*60
         self.height = (self.size + 2)*60
-        self.x1 = 50
-        self.y1 = 50
-        self.x2 = 50
-        self.y2 = 60
-        self.lines = []
         self.algorithm = 0
         self.counter = 0
         self.filled = 0
@@ -108,9 +103,14 @@ class PuzzleWindow(QDialog):
             self.label = self.labels[cell.y][cell.x]
             self.label.setStyleSheet("border : solid {};""border-width : 2px 2px 2px 2px;".format(self.color_space[self.counter]))
         self.counter = (self.counter+ 1) % len(self.color_space)
+
     def drawBoard(self):
         self.setWindowTitle(self.title)
-        self.setGeometry(self.left, self.top, self.width, self.height)
+        self.resize(self.width, self.height)
+        qr = self.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
         # call generate function from generate.py
         self.cages,sol = generate(self.size)
 
@@ -136,10 +136,10 @@ class PuzzleWindow(QDialog):
                 self.label.resize(60, 60)
                 self.label.move((i+1)*60, (j+1)*60)
 
-                self.x1 = self.label.x()
-                self.y1 = self.label.y()
-                self.x2 = self.x1 + 40
-                self.y2 = self.y1 + 40
+                # self.x1 = self.label.x()
+                # self.y1 = self.label.y()
+                # self.x2 = self.x1 + 40
+                # self.y2 = self.y1 + 40
 
                 # print(i, j, self.label.x(), self.label.y())
                 self.label.setStyleSheet("border : solid black;"
@@ -165,7 +165,6 @@ class PuzzleWindow(QDialog):
             elif op == Operator.Divide:
                 self.set_operator_value("÷",int(cage.value),cage.cells,"purple")
                 
-        
         
         # Create a button in the window
         self.button_generate = QPushButton('New Board', self)
@@ -232,7 +231,6 @@ class PuzzleWindow(QDialog):
                     self.label.setText("<div style='position:fixed;top:0;left:0;font-size:20px;color:#f0f0f0;'><sup>3-</sup></div>")
                 self.label.setText(self.label.text() + "<div style='font-size:30px;text-align:center;'>{}</div>".format(self.solved_board[i][j]))
                 
-
 
     def reset_board(self):
         if self.filled == 1:
