@@ -89,7 +89,7 @@ class PuzzleWindow(QDialog):
         self.height = (self.size + 2)*60
         self.algorithm = 0
         self.counter = 0
-        self.filled = 0
+        self.filled = False
         self.drawBoard()
 
     def set_operator_value(self,op,value,cells,color):
@@ -233,8 +233,8 @@ class PuzzleWindow(QDialog):
                 
 
     def reset_board(self):
-        if self.filled == 1:
-            self.filled = 0
+        if self.filled == True:
+            self.filled = False
 
             for i in range(self.size):
                 for j in range(self.size):
