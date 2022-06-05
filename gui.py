@@ -1,13 +1,8 @@
-from ntpath import join
 import sys
-import enum
-from tkinter import Spinbox
-from webbrowser import Opera
-from cv2 import multiply, subtract
 import numpy as np
-from PyQt5.QtGui import *
+from PyQt5.QtGui import QFontDatabase, QFont
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
+from PyQt5.QtCore import Qt, pyqtSlot
 from Generate import generate
 from Utilities import solve
 from main_utilities import *
