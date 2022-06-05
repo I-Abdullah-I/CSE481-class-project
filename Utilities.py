@@ -2,7 +2,7 @@ from datetime import datetime
 # import enum
 # from math import fabs
 import numpy as np
-# from Generate import generate
+from Generate import generate, generate_n_boards
 from main_utilities import *
 import copy
 # import timeit
@@ -419,7 +419,6 @@ def Diff(li1, li2):
 # print(datetime.now() - t1)
 
 """Random n boards testcase"""
-
 # size = 6
 # n = 100
 # algorithms = ['Bactracking','Forward Checking' , 'Arc Consistency']
